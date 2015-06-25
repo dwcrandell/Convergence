@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 
 def main(argv):
     data = open_file(argv[0])
-    energies = []
-    delta = []
-    points = []
+    energies, delta, points, = [], [], []
     count = 0
     for line in data.split('\n'):
         if line.strip().startswith("energy:"):
@@ -21,8 +19,7 @@ def main(argv):
     x = min(energies)
     scaled = []
     for energy in energies:
-        energy = energy - x
-        scaled.append(energy)
+        scaled.append(energy-x)
     plt.plot(points,scaled)
     #Set axis labels
     plt.ylabel('Energy change (kcal/mol)')
