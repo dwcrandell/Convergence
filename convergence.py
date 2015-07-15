@@ -1,44 +1,36 @@
 '''Plot the convergence of a Jaguar DFT calculation from the logfile using matplotlib
-Doug Crandell-Indiana University 2015'''
+Doug Crandell-Indiana University 2014'''
 
 import sys
 import os
 import matplotlib.pyplot as plt
 
-def main(argv):
-    data = open_file(argv[0])
-    energies = []
-    delta = []
-    points = []
-    count = 0
+def main(logfile):
+    #Take logfile or calcid as input from command line
+    data = open_file(logfile[0])
+    energies, scaled = [], []
     for line in data.split('\n'):
         if line.strip().startswith("energy:"):
-           count += 1
-           points.append(count)
            line = (filter(None,line.split(' ')))
            energy = float(line[1]) * 627.509 #Convert energy from hartree to kcal/mol
            energies.append(energy)
-    x = min(energies)
-    scaled = []
-    for energy in energies:
-        energy = energy - x
-        scaled.append(energy)
-    plt.plot(points,scaled)
-    #Set axis labels
+    #Scale energies so that minimum energy is set at 0
+    min_energy = min(energies)
+    scaled = [energy - min_energy for energy in energies]
+
+    plt.plot(range(1,len(scaled)+1),scaled)
     plt.ylabel('Energy change (kcal/mol)')
     plt.xlabel('Optimization Step')
     plt.title('Optimization Convergence')
     plt.show()
 
 def open_file(file):
-    if len(file.split('.')) > 1:
-        if file.split('.')[1] == 'log':
+    if len(file.split('.')) > 1 and file.split('.')[1] == 'log':
             with open(file,'r') as f:
                 data = f.read()
     else:
         try:
             outfile = os.getcwd() +'/' + file + '.log' #Get output file based on user input of calc_id
-            print outfile
             with open (outfile, 'r') as f:
                 data = f.read()
         except:
